@@ -1,1 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Programador Mensual de Repertorio</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 600px; margin: auto; }
+    h1 { color: #1DB954; font-size: 1.5rem; text-align: center; }
+    .card { background: #1e1e1e; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; color: #b3b3b3; }
+    input[type="date"] { width: 100%; padding: 8px; margin-bottom: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
+    textarea { width: 100%; height: 80px; padding: 8px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-family: monospace; }
+    button { width: 100%; padding: 12px; background: #1DB954; border: none; color: #000; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #1ed760; }
+    .status { margin-top: 15px; text-align: center; font-weight: bold; }
+  </style>
+</head>
+<body>
 
+  <h1>🎵 Programador Mensual de Repertorio</h1>
+  <p style="text-align: center; color: #888; font-size: 0.9rem;">Configura las canciones del mes. Se actualizarán los lunes a las 7:00 AM.</p>
+
+  <form id="repertorioForm">
+    <!-- Semana 1 -->
+    <div class="card">
+      <label>Semana 1 (Fecha del Lunes):</label>
+      <input type="date" class="fecha-semana">
+      <label>Canciones (una por línea):</label>
+      <textarea class="canciones-semana" placeholder="Way Maker - Sinach&#10;Reckless Love - Cory Asbury"></textarea>
+    </div>
+
+    <!-- Semana 2 -->
+    <div class="card">
+      <label>Semana 2 (Fecha del Lunes):</label>
+      <input type="date" class="fecha-semana">
+      <label>Canciones (una por línea):</label>
+      <textarea class="canciones-semana"></textarea>
+    </div>
+
+    <!-- Semana 3 -->
+    <div class="card">
+      <label>Semana 3 (Fecha del Lunes):</label>
+      <input type="date" class="fecha-semana">
+      <label>Canciones (una por línea):</label>
+      <textarea class="canciones-semana"></textarea>
+    </div>
+
+    <!-- Semana 4 -->
+    <div class="card">
+      <label>Semana 4 (Fecha del Lunes):</label>
+      <input type="date" class="fecha-semana">
+      <label>Canciones (una por línea):</label>
+      <textarea class="canciones-semana"></textarea>
+    </div>
+
+    <button type="button" onclick="guardarProgramacion()">🚀 Guardar Programación Mensual</button>
+  </form>
+
+  <div id="status" class="status"></div>
+
+  <script>
+    const GITHUB_USERNAME = "TU_USUARIO_GITHUB";
+    const REPO_NAME = "TU_NOMBRE_REPOSITORIO";
+    const GITHUB_TOKEN = "ghp_TU_PERSONAL_ACCESS_TOKEN";
+
+    async function guardarProgramacion() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.style.color = '#e2a03f';
+      statusDiv.innerText = "Guardando en GitHub...";
+
+      const fechas = document.querySelectorAll('.fecha-semana');
+      const cancionesTextareas = document.querySelectorAll('.canciones-semana');
+
+      let programacionJSON = {};
+
+      fechas.forEach((inputFecha, index) => {
+        const fecha = inputFecha.value;
+        const textoCanciones = cancionesTextareas[index].value.trim();
+
+        if (fecha && textoCanciones) {
+          const listaCanciones = textoCanciones.split('\n').map(c => c.trim()).filter(c => c.length > 0);
+          programacionJSON[fecha] = listaCanciones;
+        }
+      });
+
+      try {
+        const urlAPI = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/canciones.json`;
+        
+        let sha = "";
+        const getRes = await fetch(urlAPI, {
+          headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        });
+        
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          sha = fileData.sha;
+        }
+
+        const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(programacionJSON, null, 2))));
+
+        const putRes = await fetch(urlAPI, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${GITHUB_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: "Actualización de programación mensual desde la App Web",
+            content: contentEncoded,
+            sha: sha ? sha : undefined
+          })
+        });
+
+        if (putRes.ok) {
+          statusDiv.style.color = '#1DB954';
+          statusDiv.innerText = "¡Éxito! Programación guardada correctamente.";
+        } else {
+          throw new Error("Error en la respuesta de GitHub API");
+        }
+      } catch (err) {
+        statusDiv.style.color = '#ff4d4d';
+        statusDiv.innerText = "Error al guardar. Verifica las credenciales de GitHub.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
