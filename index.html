@@ -15,8 +15,13 @@
     label { font-size: 0.85rem; color: var(--muted); display: block; margin-top: 8px; margin-bottom: 4px; }
     input, textarea, select { width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #3d3d3d; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 0.9rem; }
     textarea { height: 90px; resize: vertical; font-family: monospace; }
-    button { width: 100%; padding: 14px; background: var(--accent); border: none; color: #000; font-weight: bold; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-    button:hover { background: #1ed760; transform: translateY(-1px); }
+    
+    button { width: 100%; padding: 14px; border: none; color: #000; font-weight: bold; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+    .btn-save { background: var(--accent); }
+    .btn-save:hover { background: #1ed760; }
+    .btn-run { background: #388e3c; color: #fff; margin-top: 15px; }
+    .btn-run:hover { background: #2e7d32; }
+
     .config-sec { border-left: 3px solid var(--accent); }
     .status { margin-top: 15px; text-align: center; font-weight: bold; padding: 10px; border-radius: 6px; }
   </style>
@@ -24,7 +29,7 @@
 <body>
 
   <h1>🎵 Gestor de Repertorio</h1>
-  <p class="subtitle">Planifica hasta 5 eventos/semanas. Soporta nombres o links directos.</p>
+  <p class="subtitle">Planifica hasta 5 eventos/semanas y sincroniza las playlists.</p>
 
   <!-- Configuración de GitHub -->
   <details class="card config-sec">
@@ -48,19 +53,24 @@
     <!-- 5 Eventos / Semanas -->
     <div id="eventosContainer"></div>
 
-    <button type="button" onclick="guardarProgramacion()">🚀 Publicar Programación en GitHub</button>
+    <button type="button" class="btn-save" onclick="guardarProgramacion()">💾 Guardar Programación en GitHub</button>
   </form>
+
+  <!-- Botón de Ejecución Inmediata -->
+  <div class="card" style="margin-top:25px; border-color:#388e3c;">
+    <span class="card-title" style="color:#81c784;">⚡ Ejecución Manual Directa</span>
+    <p style="font-size:0.85rem; color:var(--muted); margin-top:5px;">Sincroniza Spotify y YouTube en este instante con las canciones de la fecha actual.</p>
+    <button type="button" class="btn-run" onclick="ejecutarSincronizacionInmediata()">🚀 Actualizar Playlists Ahora</button>
+  </div>
 
   <div id="status" class="status"></div>
 
   <script>
-    // Cargar credenciales guardadas
     window.onload = () => {
       document.getElementById('ghUser').value = localStorage.getItem('ghUser') || '';
       document.getElementById('ghRepo').value = localStorage.getItem('ghRepo') || '';
       document.getElementById('ghToken').value = localStorage.getItem('ghToken') || '';
       
-      // Inicializar el mes actual
       const hoy = new Date();
       const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
       document.getElementById('mesSeleccionado').value = mesActual;
@@ -87,8 +97,8 @@
             </div>
             <label>Fecha de Ejecución (Lunes):</label>
             <input type="date" class="fecha-evento" id="fecha-${i}">
-            <label>Canciones (Nombre o Link de Spotify/YouTube - una por línea):</label>
-            <textarea class="canciones-evento" id="canciones-${i}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/4cOdK2wG...&#10;https://www.youtube.com/watch?v=dQw4w9WgXcQ"></textarea>
+            <label>Canciones (Nombre o Link de Spotify/YouTube):</label>
+            <textarea class="canciones-evento" id="canciones-${i}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/4cOdK2wG..."></textarea>
           </div>
         `;
       }
@@ -102,7 +112,7 @@
       let lunes = [];
 
       while (date.getMonth() === month - 1) {
-        if (date.getDay() === 1) { // 1 = Lunes
+        if (date.getDay() === 1) {
           const yyyy = date.getFullYear();
           const mm = String(date.getMonth() + 1).padStart(2, '0');
           const dd = String(date.getDate()).padStart(2, '0');
@@ -119,7 +129,7 @@
           card.style.display = 'block';
         } else {
           inputFecha.value = '';
-          if (i === 5) card.style.display = 'none'; // Oculta el evento 5 si el mes solo tiene 4 lunes
+          if (i === 5) card.style.display = 'none';
         }
       }
     }
@@ -128,19 +138,18 @@
       const user = localStorage.getItem('ghUser');
       const repo = localStorage.getItem('ghRepo');
       const token = localStorage.getItem('ghToken');
-
       const statusDiv = document.getElementById('status');
 
       if (!user || !repo || !token) {
         statusDiv.style.background = '#ff4d4d22';
         statusDiv.style.color = '#ff4d4d';
-        statusDiv.innerText = " Configura tu Usuario, Repositorio y Token en la sección superior.";
+        statusDiv.innerText = "⚠️ Configura Usuario, Repositorio y Token en la sección superior.";
         return;
       }
 
       statusDiv.style.background = '#e2a03f22';
       statusDiv.style.color = '#e2a03f';
-      statusDiv.innerText = "⏳ Guardando cambios en GitHub...";
+      statusDiv.innerText = "⏳ Guardando cambios en canciones.json...";
 
       let programacionJSON = {};
 
@@ -182,14 +191,62 @@
         if (putRes.ok) {
           statusDiv.style.background = '#1DB95422';
           statusDiv.style.color = '#1DB954';
-          statusDiv.innerText = " ¡Éxito! Repertorio guardado correctamente en canciones.json.";
+          statusDiv.innerText = "✔ ¡Éxito! Canciones guardadas correctamente.";
         } else {
-          throw new Error("Error en la API de GitHub.");
+          throw new Error("Error al guardar en GitHub.");
         }
       } catch (err) {
         statusDiv.style.background = '#ff4d4d22';
         statusDiv.style.color = '#ff4d4d';
-        statusDiv.innerText = "❌ Error al guardar. Verifica el Token y los datos de GitHub.";
+        statusDiv.innerText = "❌ Error al guardar. Verifica el Token y los datos.";
+        console.error(err);
+      }
+    }
+
+    async function ejecutarSincronizacionInmediata() {
+      const user = localStorage.getItem('ghUser');
+      const repo = localStorage.getItem('ghRepo');
+      const token = localStorage.getItem('ghToken');
+      const statusDiv = document.getElementById('status');
+
+      if (!user || !repo || !token) {
+        statusDiv.style.background = '#ff4d4d22';
+        statusDiv.style.color = '#ff4d4d';
+        statusDiv.innerText = "⚠️ Configura Usuario, Repositorio y Token en la sección superior.";
+        return;
+      }
+
+      statusDiv.style.background = '#e2a03f22';
+      statusDiv.style.color = '#e2a03f';
+      statusDiv.innerText = "⏳ Solicitando ejecución a GitHub Actions...";
+
+      try {
+        // Llama a la API de GitHub para disparar el workflow sync_playlists.yml
+        const urlAPI = `https://api.github.com/repos/${user}/${repo}/actions/workflows/sync_playlists.yml/dispatches`;
+
+        const res = await fetch(urlAPI, {
+          method: 'POST',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ref: 'main'
+          })
+        });
+
+        if (res.status === 204) {
+          statusDiv.style.background = '#1DB95422';
+          statusDiv.style.color = '#1DB954';
+          statusDiv.innerText = "⚡ ¡Automatización iniciada! En 1-2 minutos tus playlists de Spotify y YouTube quedarán actualizadas.";
+        } else {
+          throw new Error("No se pudo iniciar la acción. Revisa los permisos del token.");
+        }
+      } catch (err) {
+        statusDiv.style.background = '#ff4d4d22';
+        statusDiv.style.color = '#ff4d4d';
+        statusDiv.innerText = "❌ Error al iniciar la ejecución en GitHub.";
         console.error(err);
       }
     }
