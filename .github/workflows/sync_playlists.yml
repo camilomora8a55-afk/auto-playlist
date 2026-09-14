@@ -2,8 +2,8 @@ name: Actualizar Playlists Semanales
 
 on:
   schedule:
-    - cron: '0 12 * * 1'  # Todos los lunes a las 12:00 UTC (7:00 AM hora Colombia)
-  workflow_dispatch:      # Permite ejecutar manualmente con un botón
+    - cron: '0 12 * * 1'  # Lunes a las 12:00 UTC (7:00 AM hora Colombia)
+  workflow_dispatch:
 
 jobs:
   update-playlists:
@@ -33,3 +33,19 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           YOUTUBE_PLAYLIST_ID: ${{ secrets.YOUTUBE_PLAYLIST_ID }}
         run: python update_playlists.py
+
+      - name: Notificar al Celular (Éxito)
+        if: success()
+        run: |
+          curl -H "Title: Playlists Actualizadas" \
+               -H "Tags: musical_note,white_check_mark" \
+               -d "🎵 Se han actualizado tus listas de Spotify y YouTube correctamente." \
+               ntfy.sh/autoplaylist_camilo8a55
+
+      - name: Notificar al Celular (Error)
+        if: failure()
+        run: |
+          curl -H "Title: Error en Playlists" \  
+               -H "Tags: x,warning" \
+               -d "❌ Ocurrió un fallo durante la actualización de las listas. Revisa los logs de GitHub." \
+               ntfy.sh/playlists_camilo_mora
