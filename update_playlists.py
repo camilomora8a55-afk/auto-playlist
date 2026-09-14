@@ -18,16 +18,16 @@ def cargar_canciones_del_dia(filepath="canciones.json"):
     with open(filepath, "r", encoding="utf-8") as f:
         programacion_mensual = json.load(f)
 
-    return programacion_mensual.get(hoy, [])
+    canciones = programacion_mensual.get(hoy, [])
+    print(f"Canciones encontradas para hoy: {len(canciones)}")
+    return canciones
 
 def extraer_spotify_uri(sp, entrada):
-    # Si es un link directo de Spotify
     if "open.spotify.com/track/" in entrada:
         match = re.search(r'track/([a-zA-Z0-9]+)', entrada)
         if match:
             return f"spotify:track:{match.group(1)}"
     
-    # Si es búsqueda por texto
     res = sp.search(q=entrada, type='track', limit=1)
     items = res.get('tracks', {}).get('items', [])
     if items:
@@ -35,13 +35,11 @@ def extraer_spotify_uri(sp, entrada):
     return None
 
 def extraer_youtube_id(youtube, entrada):
-    # Si es un link de YouTube
     if "youtube.com/watch" in entrada or "youtu.be/" in entrada:
         match = re.search(r'(?:v=|\/)([a-zA-Z0-9_-]{11})', entrada)
         if match:
             return match.group(1)
             
-    # Si es búsqueda por texto
     search_req = youtube.search().list(q=entrada, part="id", type="video", maxResults=1)
     search_res = search_req.execute()
     videos = search_res.get("items", [])
@@ -51,39 +49,52 @@ def extraer_youtube_id(youtube, entrada):
 
 def actualizar_spotify(canciones):
     print("\n--- Actualizando Spotify ---")
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-        client_id=os.environ.get("SPOTIFY_CLIENT_ID"),
-        client_secret=os.environ.get("SPOTIFY_CLIENT_SECRET"),
+    client_id = os.environ.get("SPOTIFY_CLIENT_ID")
+    client_secret = os.environ.get("SPOTIFY_CLIENT_SECRET")
+    refresh_token = os.environ.get("SPOTIFY_REFRESH_TOKEN")
+    playlist_id = os.environ.get("SPOTIFY_PLAYLIST_ID")
+
+    sp_oauth = SpotifyOAuth(
+        client_id=client_id,
+        client_secret=client_secret,
         redirect_uri="http://127.0.0.1:8888/callback",
         scope="playlist-modify-public playlist-modify-private"
-    ))
+    )
+    
+    # Obtener un access token válido usando el refresh_token de GitHub Secrets
+    token_info = sp_oauth.refresh_access_token(refresh_token)
+    sp = spotipy.Spotify(auth=token_info['access_token'])
 
     track_uris = []
     for item in canciones:
         uri = extraer_spotify_uri(sp, item)
         if uri:
             track_uris.append(uri)
-            print(f"[Spotify] Procesado correctamente: {item}")
+            print(f"[Spotify] Procesado: {item}")
         else:
             print(f"[Spotify] No encontrado: {item}")
 
     if track_uris:
-        sp.playlist_replace_items(os.environ.get("SPOTIFY_PLAYLIST_ID"), track_uris)
+        sp.playlist_replace_items(playlist_id, track_uris)
         print("Spotify playlist actualizada exitosamente.")
 
 def actualizar_youtube(canciones):
     print("\n--- Actualizando YouTube ---")
+    client_id = os.environ.get("YOUTUBE_CLIENT_ID")
+    client_secret = os.environ.get("YOUTUBE_CLIENT_SECRET")
+    refresh_token = os.environ.get("YOUTUBE_REFRESH_TOKEN")
+    playlist_id = os.environ.get("YOUTUBE_PLAYLIST_ID")
+
     creds = Credentials(
         token=None,
-        refresh_token=os.environ.get("YOUTUBE_REFRESH_TOKEN"),
-        client_id=os.environ.get("YOUTUBE_CLIENT_ID"),
-        client_secret=os.environ.get("YOUTUBE_CLIENT_SECRET"),
+        refresh_token=refresh_token,
+        client_id=client_id,
+        client_secret=client_secret,
         token_uri="https://oauth2.googleapis.com/token"
     )
     youtube = build('youtube', 'v3', credentials=creds)
-    playlist_id = os.environ.get("YOUTUBE_PLAYLIST_ID")
 
-    # Limpiar Playlist
+    # Vaciar Playlist
     items_req = youtube.playlistItems().list(part="id", playlistId=playlist_id, maxResults=50)
     items_res = items_req.execute()
     for item in items_res.get("items", []):
