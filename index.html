@@ -1,494 +1,538 @@
 <!DOCTYPE html>
-<html lang="es" class="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestor de Repertorio</title>
-    <meta
-      name="description"
-      content="Planifica hasta 5 eventos por mes y sincroniza tus playlists de Spotify y YouTube."
-    />
-    <meta name="theme-color" content="#ffffff" />
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Repertorio</title>
+  <style>
+    :root {
+      --bg: #F4F4F5;
+      --card: #FFFFFF;
+      --border: #E4E4E7;
+      --text: #09090B;
+      --muted: #71717A;
+      --radius: 16px;
+      --input-radius: 10px;
+    }
 
-    <!-- Tailwind Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <!-- Inter font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-            },
-            colors: {
-              background: "#ffffff",
-              foreground: "#252525",
-              card: "#ffffff",
-              border: "#e6e6e6",
-              muted: "#f7f7f7",
-              "muted-foreground": "#8c8c8c",
-            },
-          },
-        },
-      };
-    </script>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-    <style>
-      html {
-        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
-      }
-      body {
-        background-color: #ffffff;
-        color: #252525;
-      }
-      /* Make native date/month pickers monochrome */
-      input[type="date"]::-webkit-calendar-picker-indicator,
-      input[type="month"]::-webkit-calendar-picker-indicator {
-        filter: grayscale(1);
-        cursor: pointer;
-      }
-      .animate-spin-slow {
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-  <body class="min-h-screen bg-background text-foreground antialiased">
-    <main class="mx-auto w-full max-w-xl px-4 py-8 sm:py-12">
-      <!-- Header -->
-      <header class="mb-8 flex flex-col items-center text-center">
-        <span
-          class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-foreground text-background"
-        >
-          <i data-lucide="music" class="h-7 w-7" stroke-width="2.25"></i>
-        </span>
-        <h1 class="mt-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Gestor de Repertorio
-        </h1>
-        <p class="mt-2 max-w-sm text-sm text-muted-foreground">
-          Planifica hasta 5 eventos por mes y sincroniza tus playlists de Spotify y YouTube.
-        </p>
-      </header>
+    .container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-      <div class="space-y-5">
-        <!-- GitHub connection -->
-        <section class="overflow-hidden rounded-2xl border border-border bg-card">
-          <button
-            type="button"
-            id="ghToggle"
-            aria-expanded="false"
-            class="flex w-full items-center gap-3 px-4 py-4 text-left"
-          >
-            <span
-              class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-foreground text-background"
-            >
-              <i data-lucide="folder-git-2" class="h-5 w-5" stroke-width="2.25"></i>
-            </span>
-            <span class="flex-1">
-              <span class="block text-sm font-semibold text-foreground">Conexión con GitHub</span>
-              <span class="block text-xs text-muted-foreground"
-                >Usuario, repositorio y token de acceso</span
-              >
-            </span>
-            <i
-              data-lucide="chevron-down"
-              id="ghChevron"
-              class="h-5 w-5 text-muted-foreground transition-transform"
-            ></i>
-          </button>
+    /* Encabezado */
+    .app-header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-          <div id="ghPanel" class="hidden space-y-4 border-t border-border px-4 py-5">
-            <div>
-              <label for="ghUser" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted-foreground"
-                >Usuario de GitHub</label
-              >
-              <input
-                id="ghUser"
-                type="text"
-                placeholder="ej: camilomora8a55-afk"
-                class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-2 focus:ring-foreground/10"
-              />
-            </div>
-            <div>
-              <label for="ghRepo" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted-foreground"
-                >Nombre del repositorio</label
-              >
-              <input
-                id="ghRepo"
-                type="text"
-                placeholder="ej: auto-playlist"
-                class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-2 focus:ring-foreground/10"
-              />
-            </div>
-            <div>
-              <label for="ghToken" class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted-foreground"
-                >Personal Access Token (PAT)</label
-              >
-              <input
-                id="ghToken"
-                type="password"
-                placeholder="ghp_xxxxxxxxxxxx"
-                class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-2 focus:ring-foreground/10"
-              />
-            </div>
-            <button
-              type="button"
-              id="ghSave"
-              class="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              Guardar credenciales localmente
-            </button>
-          </div>
-        </section>
+    .main-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--text);
+      color: #FFF;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
 
-        <!-- Month selector -->
-        <section class="rounded-2xl border border-border bg-card px-4 py-4">
-          <div class="flex items-center gap-3">
-            <span
-              class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-foreground text-background"
-            >
-              <i data-lucide="calendar-days" class="h-5 w-5" stroke-width="2.25"></i>
-            </span>
-            <div class="flex-1">
-              <label for="mesSeleccionado" class="block text-sm font-semibold text-foreground"
-                >Mes a programar</label
-              >
-              <p class="text-xs text-muted-foreground">Cargamos los lunes del mes automáticamente</p>
-            </div>
-          </div>
-          <input
-            id="mesSeleccionado"
-            type="month"
-            class="mt-4 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-2 focus:ring-foreground/10"
-          />
-        </section>
+    .app-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
 
-        <!-- Event cards -->
-        <div id="events" class="space-y-5"></div>
+    .app-header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.4;
+      max-width: 420px;
+      margin: 0 auto;
+    }
 
-        <!-- Save button -->
-        <button
-          type="button"
-          id="saveBtn"
-          class="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-3.5 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          <i data-lucide="save" class="h-4 w-4" stroke-width="2.5"></i>
-          <span id="saveLabel">Guardar programación en GitHub</span>
-        </button>
+    /* Tarjetas */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
 
-        <!-- Sync panel -->
-        <section class="rounded-2xl border border-border bg-card px-4 py-5">
-          <div class="flex items-start gap-3">
-            <span
-              class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-foreground text-background"
-            >
-              <i data-lucide="zap" class="h-5 w-5" stroke-width="2.25"></i>
-            </span>
-            <div class="flex-1">
-              <h2 class="text-sm font-semibold text-foreground">Ejecución manual directa</h2>
-              <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                Sincroniza Spotify y YouTube en este instante con las canciones de la fecha actual.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            id="syncBtn"
-            class="mt-4 w-full rounded-lg border border-foreground bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background disabled:opacity-50"
-          >
-            Actualizar playlists ahora
-          </button>
-        </section>
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
 
-        <!-- Status banner -->
-        <div id="status"></div>
+    .card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-box {
+      width: 42px;
+      height: 42px;
+      background: var(--text);
+      color: #FFF;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .title-group h2, .title-group h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .title-group p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .song-counter {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Formulario e Inputs */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="month"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--input-radius);
+      background: #FFF;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--text);
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    /* Botones */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--input-radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      background: #FFF;
+      border: 1px solid var(--border);
+      color: var(--text);
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #F4F4F5;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      border: 1px solid var(--text);
+      color: #FFF;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    /* Desplegable GitHub */
+    details summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    details summary::-webkit-details-marker { display: none; }
+
+    .chevron {
+      transition: transform 0.2s;
+    }
+    details[open] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .status {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 12px;
+      border-radius: var(--input-radius);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Encabezado -->
+    <header class="app-header">
+      <div class="main-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       </div>
+      <h1>Gestor de Repertorio</h1>
+      <p>Planifica hasta 5 eventos por mes y sincroniza tus playlists de Spotify y YouTube.</p>
+    </header>
 
-      <footer class="mt-10 text-center text-xs text-muted-foreground">
-        Tus credenciales se guardan solo en este navegador.
-      </footer>
-    </main>
+    <!-- Configuración GitHub (Desplegable) -->
+    <details class="card">
+      <summary class="card-header" style="margin-bottom:0;">
+        <div class="card-header-left">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+          </div>
+          <div class="title-group">
+            <h2>Conexión con GitHub</h2>
+            <p>Usuario, repositorio y token de acceso</p>
+          </div>
+        </div>
+        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </summary>
 
-    <script>
-      const MAX_EVENTS = 5;
-      const STORAGE_KEYS = { user: "ghUser", repo: "ghRepo", token: "ghToken" };
+      <div style="margin-top: 20px;">
+        <div class="form-group">
+          <label>USUARIO DE GITHUB</label>
+          <input type="text" id="ghUser" placeholder="ej: camilomora8a55-afk">
+        </div>
+        <div class="form-group">
+          <label>NOMBRE DEL REPOSITORIO</label>
+          <input type="text" id="ghRepo" placeholder="ej: auto-playlist">
+        </div>
+        <div class="form-group">
+          <label>PERSONAL ACCESS TOKEN (PAT)</label>
+          <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="guardarConfig()">Guardar credenciales localmente</button>
+      </div>
+    </details>
 
-      // ---------- Helpers ----------
-      function currentMonth() {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    <!-- Mes a programar -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <div class="title-group">
+            <h2>Mes a programar</h2>
+            <p>Cargamos los lunes del mes automáticamente</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <input type="month" id="mesSeleccionado" onchange="autoCompletarLunes()">
+      </div>
+    </div>
+
+    <!-- Contenedor de los 5 Eventos -->
+    <form id="repertorioForm">
+      <div id="eventosContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
+
+      <!-- Botones de Acción -->
+      <div style="margin-top: 20px; display:flex; flex-direction:column; gap:10px;">
+        <button type="button" class="btn btn-primary" onclick="guardarProgramacion()">💾 Guardar Programación en GitHub</button>
+        <button type="button" class="btn btn-secondary" onclick="ejecutarSincronizacionInmediata()">🚀 Actualizar Playlists Ahora</button>
+      </div>
+    </form>
+
+    <div id="status" class="status"></div>
+
+  </div>
+
+  <script>
+    window.onload = () => {
+      document.getElementById('ghUser').value = localStorage.getItem('ghUser') || '';
+      document.getElementById('ghRepo').value = localStorage.getItem('ghRepo') || '';
+      document.getElementById('ghToken').value = localStorage.getItem('ghToken') || '';
+      
+      const hoy = new Date();
+      const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
+      document.getElementById('mesSeleccionado').value = mesActual;
+      
+      renderizarEventos();
+      autoCompletarLunes();
+    };
+
+    function guardarConfig() {
+      localStorage.setItem('ghUser', document.getElementById('ghUser').value.trim());
+      localStorage.setItem('ghRepo', document.getElementById('ghRepo').value.trim());
+      localStorage.setItem('ghToken', document.getElementById('ghToken').value.trim());
+      alert('Credenciales guardadas localmente.');
+    }
+
+    function renderizarEventos() {
+      const container = document.getElementById('eventosContainer');
+      container.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        container.innerHTML += `
+          <div class="card" id="card-evento-${i}">
+            <div class="card-header">
+              <div class="card-header-left">
+                <div class="icon-box">${i}</div>
+                <div class="title-group">
+                  <h3 id="title-evento-${i}">Evento / Semana ${i}</h3>
+                  <p id="sub-evento-${i}">Lunes de ejecución</p>
+                </div>
+              </div>
+              <div class="song-counter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <span id="count-${i}">0</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>FECHA DE EJECUCIÓN (LUNES)</label>
+              <input type="date" id="fecha-${i}">
+            </div>
+
+            <div class="form-group">
+              <label>CANCIONES (NOMBRE O LINK POR LÍNEA)</label>
+              <textarea id="canciones-${i}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/..." oninput="actualizarContador(${i})"></textarea>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function actualizarContador(index) {
+      const texto = document.getElementById(`canciones-${index}`).value.trim();
+      const lineas = texto ? texto.split('\n').filter(l => l.trim().length > 0).length : 0;
+      document.getElementById(`count-${index}`).innerText = lineas;
+    }
+
+    function autoCompletarLunes() {
+      const [year, month] = document.getElementById('mesSeleccionado').value.split('-').map(Number);
+      if (!year || !month) return;
+
+      const formatDate = (d) => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+
+      const formatSubDate = (d) => {
+        const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+        let str = d.toLocaleDateString('es-ES', opciones);
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      };
+
+      let listaFechas = [];
+      let listaObjetosDate = [];
+
+      // 1. Último lunes del mes anterior
+      let ultimoDiaPrevio = new Date(year, month - 1, 0); 
+      while (ultimoDiaPrevio.getDay() !== 1) { 
+        ultimoDiaPrevio.setDate(ultimoDiaPrevio.getDate() - 1);
+      }
+      listaFechas.push(formatDate(ultimoDiaPrevio));
+      listaObjetosDate.push(new Date(ultimoDiaPrevio));
+
+      // 2. Lunes del mes actual
+      let dateCurr = new Date(year, month - 1, 1);
+      while (dateCurr.getMonth() === month - 1) {
+        if (dateCurr.getDay() === 1) {
+          listaFechas.push(formatDate(dateCurr));
+          listaObjetosDate.push(new Date(dateCurr));
+        }
+        dateCurr.setDate(dateCurr.getDate() + 1);
       }
 
-      function mondaysInMonth(month) {
-        const [year, m] = month.split("-").map(Number);
-        if (!year || !m) return [];
-        const mondays = [];
-        const date = new Date(year, m - 1, 1);
-        while (date.getMonth() === m - 1) {
-          if (date.getDay() === 1) {
-            const mm = String(date.getMonth() + 1).padStart(2, "0");
-            const dd = String(date.getDate()).padStart(2, "0");
-            mondays.push(`${date.getFullYear()}-${mm}-${dd}`);
+      // 3. Renderizar en la interfaz
+      for (let i = 1; i <= 5; i++) {
+        const inputFecha = document.getElementById(`fecha-${i}`);
+        const card = document.getElementById(`card-evento-${i}`);
+        const titleH3 = document.getElementById(`title-evento-${i}`);
+        const subP = document.getElementById(`sub-evento-${i}`);
+
+        if (listaFechas[i - 1]) {
+          inputFecha.value = listaFechas[i - 1];
+          card.style.display = 'block';
+
+          if (i === 1) {
+            titleH3.innerText = "Evento 1 (Previo)";
+          } else {
+            titleH3.innerText = `Evento / Semana ${i - 1}`;
           }
-          date.setDate(date.getDate() + 1);
+          subP.innerText = formatSubDate(listaObjetosDate[i - 1]);
+        } else {
+          inputFecha.value = '';
+          card.style.display = 'none';
         }
-        return mondays;
+      }
+    }
+
+    async function guardarProgramacion() {
+      const user = localStorage.getItem('ghUser');
+      const repo = localStorage.getItem('ghRepo');
+      const token = localStorage.getItem('ghToken');
+      const statusDiv = document.getElementById('status');
+
+      if (!user || !repo || !token) {
+        mostrarStatus("⚠️ Configura Usuario, Repositorio y Token arriba.", "#FEF2F2", "#991B1B");
+        return;
       }
 
-      function formatEventDate(iso) {
-        if (!iso) return "";
-        const [year, m, d] = iso.split("-").map(Number);
-        const date = new Date(year, m - 1, d);
-        return date.toLocaleDateString("es-ES", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-        });
-      }
+      mostrarStatus("⏳ Guardando cambios en canciones.json...", "#FEF3C7", "#92400E");
 
-      function encodeContent(value) {
-        return btoa(unescape(encodeURIComponent(value)));
-      }
+      let programacionJSON = {};
 
-      function getCredentials() {
-        return {
-          user: document.getElementById("ghUser").value.trim(),
-          repo: document.getElementById("ghRepo").value.trim(),
-          token: document.getElementById("ghToken").value.trim(),
-        };
-      }
+      for (let i = 1; i <= 5; i++) {
+        const fecha = document.getElementById(`fecha-${i}`).value;
+        const texto = document.getElementById(`canciones-${i}`).value.trim();
 
-      function hasCredentials(c) {
-        return Boolean(c.user && c.repo && c.token);
-      }
-
-      // ---------- State ----------
-      let events = [];
-
-      function buildEvents(month) {
-        const mondays = mondaysInMonth(month);
-        const previous = events;
-        events = Array.from({ length: MAX_EVENTS }, (_, i) => ({
-          id: i + 1,
-          date: mondays[i] ?? "",
-          songs: previous[i]?.songs ?? "",
-        }));
-      }
-
-      // ---------- Rendering ----------
-      function renderEvents() {
-        const container = document.getElementById("events");
-        container.innerHTML = "";
-        events
-          .filter((e) => e.date)
-          .forEach((event) => {
-            const songCount = event.songs
-              .split("\n")
-              .map((l) => l.trim())
-              .filter(Boolean).length;
-
-            const section = document.createElement("section");
-            section.className = "rounded-2xl border border-border bg-card";
-            section.innerHTML = `
-              <header class="flex items-center gap-3 border-b border-border px-4 py-3.5">
-                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-sm font-semibold text-background">${event.id}</span>
-                <div class="flex-1">
-                  <span class="block text-sm font-semibold text-foreground">Evento / Semana ${event.id}</span>
-                  <span class="block text-xs capitalize text-muted-foreground">${event.date ? formatEventDate(event.date) : "Sin fecha asignada"}</span>
-                </div>
-                <span class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <i data-lucide="list-music" class="h-4 w-4" stroke-width="2.25"></i>${songCount}
-                </span>
-              </header>
-              <div class="space-y-4 px-4 py-4">
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Fecha de ejecución (lunes)</label>
-                  <input type="date" data-field="date" data-id="${event.id}" value="${event.date}"
-                    class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-2 focus:ring-foreground/10" />
-                </div>
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Canciones (nombre o link)</label>
-                  <textarea data-field="songs" data-id="${event.id}"
-                    placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/4cOdK2wG..."
-                    class="h-28 w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 font-mono text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-2 focus:ring-foreground/10">${event.songs}</textarea>
-                </div>
-              </div>`;
-            container.appendChild(section);
-          });
-
-        container.querySelectorAll("[data-field]").forEach((el) => {
-          el.addEventListener("input", (e) => {
-            const id = Number(e.target.getAttribute("data-id"));
-            const field = e.target.getAttribute("data-field");
-            const item = events.find((ev) => ev.id === id);
-            if (item) {
-              item[field] = e.target.value;
-              if (field === "date" || field === "songs") renderEvents();
-            }
-          });
-        });
-
-        lucide.createIcons();
-      }
-
-      function setStatus(type, message) {
-        const el = document.getElementById("status");
-        if (type === "idle" || !message) {
-          el.innerHTML = "";
-          return;
+        if (fecha && texto) {
+          const lista = texto.split('\n').map(linea => linea.trim()).filter(linea => linea.length > 0);
+          programacionJSON[fecha] = lista;
         }
-        const iconMap = { loading: "loader-2", success: "check", error: "triangle-alert" };
-        let cls = "border-border bg-muted text-muted-foreground";
-        if (type === "success") cls = "border-foreground bg-foreground text-background";
-        if (type === "error") cls = "border-foreground/20 bg-muted text-foreground";
-        const spin = type === "loading" ? "animate-spin-slow" : "";
-        el.innerHTML = `
-          <div role="status" aria-live="polite"
-            class="flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium ${cls}">
-            <i data-lucide="${iconMap[type]}" class="h-4 w-4 shrink-0 ${spin}" stroke-width="2.5"></i>
-            <span>${message}</span>
-          </div>`;
-        lucide.createIcons();
       }
 
-      // ---------- GitHub API ----------
-      async function saveProgramacion(creds, programacion) {
-        const url = `https://api.github.com/repos/${creds.user}/${creds.repo}/contents/canciones.json`;
+      try {
+        const urlAPI = `https://api.github.com/repos/${user}/${repo}/contents/canciones.json`;
         let sha = "";
-        const getRes = await fetch(url, { headers: { Authorization: `token ${creds.token}` } });
+        
+        const getRes = await fetch(urlAPI, { headers: { 'Authorization': `token ${token}` } });
         if (getRes.ok) {
           const fileData = await getRes.json();
           sha = fileData.sha;
         }
-        const putRes = await fetch(url, {
-          method: "PUT",
+
+        const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(programacionJSON, null, 2))));
+
+        const putRes = await fetch(urlAPI, {
+          method: 'PUT',
           headers: {
-            Authorization: `token ${creds.token}`,
-            "Content-Type": "application/json",
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             message: "Actualización de canciones desde la App Web",
-            content: encodeContent(JSON.stringify(programacion, null, 2)),
-            sha: sha || undefined,
-          }),
+            content: contentEncoded,
+            sha: sha ? sha : undefined
+          })
         });
-        if (!putRes.ok) throw new Error("Error al guardar en GitHub.");
+
+        if (putRes.ok) {
+          mostrarStatus("✔ ¡Éxito! Canciones guardadas en GitHub.", "#ECFDF5", "#065F46");
+        } else {
+          throw new Error("Error en la API de GitHub.");
+        }
+      } catch (err) {
+        mostrarStatus("❌ Error al guardar. Verifica credenciales.", "#FEF2F2", "#991B1B");
+      }
+    }
+
+    async function ejecutarSincronizacionInmediata() {
+      const user = localStorage.getItem('ghUser');
+      const repo = localStorage.getItem('ghRepo');
+      const token = localStorage.getItem('ghToken');
+
+      if (!user || !repo || !token) {
+        mostrarStatus("⚠️ Configura Usuario, Repositorio y Token arriba.", "#FEF2F2", "#991B1B");
+        return;
       }
 
-      async function triggerSync(creds) {
-        const url = `https://api.github.com/repos/${creds.user}/${creds.repo}/actions/workflows/sync_playlists.yml/dispatches`;
-        const res = await fetch(url, {
-          method: "POST",
+      mostrarStatus("⏳ Iniciando actualización en GitHub Actions...", "#FEF3C7", "#92400E");
+
+      try {
+        const urlAPI = `https://api.github.com/repos/${user}/${repo}/actions/workflows/sync_playlists.yml/dispatches`;
+
+        const res = await fetch(urlAPI, {
+          method: 'POST',
           headers: {
-            Authorization: `token ${creds.token}`,
-            Accept: "application/vnd.github+json",
-            "Content-Type": "application/json",
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ ref: "main" }),
+          body: JSON.stringify({ ref: 'main' })
         });
-        if (res.status !== 204) throw new Error("No se pudo iniciar la acción.");
+
+        if (res.status === 204) {
+          mostrarStatus("⚡ ¡Proceso iniciado! Playlists actualizándose.", "#ECFDF5", "#065F46");
+        } else {
+          throw new Error("Error al disparar la acción.");
+        }
+      } catch (err) {
+        mostrarStatus("❌ Error al iniciar la ejecución.", "#FEF2F2", "#991B1B");
       }
+    }
 
-      function requireCredentials() {
-        if (!hasCredentials(getCredentials())) {
-          setStatus("error", "Configura usuario, repositorio y token en la sección de conexión.");
-          return false;
-        }
-        return true;
-      }
-
-      // ---------- Events wiring ----------
-      document.getElementById("ghToggle").addEventListener("click", (e) => {
-        const btn = e.currentTarget;
-        const open = btn.getAttribute("aria-expanded") === "true";
-        btn.setAttribute("aria-expanded", String(!open));
-        document.getElementById("ghPanel").classList.toggle("hidden", open);
-        document.getElementById("ghChevron").classList.toggle("rotate-180", !open);
-      });
-
-      document.getElementById("ghSave").addEventListener("click", () => {
-        const c = getCredentials();
-        localStorage.setItem(STORAGE_KEYS.user, c.user);
-        localStorage.setItem(STORAGE_KEYS.repo, c.repo);
-        localStorage.setItem(STORAGE_KEYS.token, c.token);
-        document.getElementById("ghSave").textContent = "Credenciales guardadas";
-      });
-
-      document.getElementById("mesSeleccionado").addEventListener("change", (e) => {
-        buildEvents(e.target.value);
-        renderEvents();
-      });
-
-      document.getElementById("saveBtn").addEventListener("click", async () => {
-        if (!requireCredentials()) return;
-        const btn = document.getElementById("saveBtn");
-        btn.disabled = true;
-        document.getElementById("saveLabel").textContent = "Guardando…";
-        setStatus("loading", "Guardando cambios en canciones.json…");
-
-        const programacion = {};
-        for (const event of events) {
-          const list = event.songs.split("\n").map((l) => l.trim()).filter(Boolean);
-          if (event.date && list.length > 0) programacion[event.date] = list;
-        }
-
-        try {
-          await saveProgramacion(getCredentials(), programacion);
-          setStatus("success", "Programación guardada correctamente.");
-        } catch {
-          setStatus("error", "Error al guardar. Verifica el token y los datos.");
-        } finally {
-          btn.disabled = false;
-          document.getElementById("saveLabel").textContent = "Guardar programación en GitHub";
-        }
-      });
-
-      document.getElementById("syncBtn").addEventListener("click", async () => {
-        if (!requireCredentials()) return;
-        const btn = document.getElementById("syncBtn");
-        btn.disabled = true;
-        btn.textContent = "Iniciando…";
-        setStatus("loading", "Solicitando ejecución a GitHub Actions…");
-
-        try {
-          await triggerSync(getCredentials());
-          setStatus(
-            "success",
-            "Automatización iniciada. En 1-2 minutos tus playlists quedarán actualizadas."
-          );
-        } catch {
-          setStatus("error", "Error al iniciar la ejecución en GitHub.");
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Actualizar playlists ahora";
-        }
-      });
-
-      // ---------- Init ----------
-      (function init() {
-        document.getElementById("ghUser").value = localStorage.getItem(STORAGE_KEYS.user) ?? "";
-        document.getElementById("ghRepo").value = localStorage.getItem(STORAGE_KEYS.repo) ?? "";
-        document.getElementById("ghToken").value = localStorage.getItem(STORAGE_KEYS.token) ?? "";
-
-        const month = currentMonth();
-        document.getElementById("mesSeleccionado").value = month;
-        buildEvents(month);
-        renderEvents();
-        lucide.createIcons();
-      })();
-    </script>
-  </body>
+    function mostrarStatus(mensaje, bg, color) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = bg;
+      statusDiv.style.color = color;
+      statusDiv.innerText = mensaje;
+    }
+  </script>
+</body>
 </html>
