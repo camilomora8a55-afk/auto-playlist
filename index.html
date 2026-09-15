@@ -6,7 +6,7 @@
   <title>Gestor de Repertorio</title>
   <style>
     :root {
-      --bg: #F4F4F5;
+      --bg: #FAFAFA;
       --card: #FFFFFF;
       --border: #E4E4E7;
       --text: #09090B;
@@ -21,48 +21,49 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      padding: 40px 20px;
+      padding: 40px 16px;
       display: flex;
       justify-content: center;
     }
 
     .container {
       width: 100%;
-      max-width: 580px;
+      max-width: 560px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
-    /* Encabezado */
+    /* Encabezado Principal */
     .app-header {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .main-icon {
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       background: var(--text);
       color: #FFF;
-      border-radius: 14px;
+      border-radius: 12px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .app-header h1 {
-      font-size: 1.75rem;
+      font-size: 1.6rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      color: var(--text);
     }
 
     .app-header p {
       color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.4;
+      font-size: 0.92rem;
+      line-height: 1.45;
       max-width: 420px;
       margin: 0 auto;
     }
@@ -72,26 +73,26 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      padding: 22px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }
 
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .card-header-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
     .icon-box {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       background: var(--text);
       color: #FFF;
       border-radius: 10px;
@@ -99,19 +100,23 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
       flex-shrink: 0;
     }
 
+    .icon-box.circle {
+      border-radius: 50%;
+    }
+
     .title-group h2, .title-group h3 {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 2px;
     }
 
     .title-group p {
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       color: var(--muted);
     }
 
@@ -120,13 +125,13 @@
       align-items: center;
       gap: 6px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
     }
 
     /* Formulario e Inputs */
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .form-group:last-child {
@@ -135,12 +140,12 @@
 
     label {
       display: block;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     input[type="text"],
@@ -149,12 +154,12 @@
     input[type="date"],
     textarea {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 13px;
       border: 1px solid var(--border);
       border-radius: var(--input-radius);
-      background: #FFF;
+      background: #FFFFFF;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-family: inherit;
       outline: none;
       transition: border-color 0.15s;
@@ -164,8 +169,12 @@
       border-color: var(--text);
     }
 
+    input::placeholder, textarea::placeholder {
+      color: #A1A1AA;
+    }
+
     textarea {
-      height: 100px;
+      height: 90px;
       resize: vertical;
       line-height: 1.4;
     }
@@ -173,9 +182,9 @@
     /* Botones */
     .btn {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border-radius: var(--input-radius);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
@@ -186,10 +195,9 @@
     }
 
     .btn-secondary {
-      background: #FFF;
+      background: #FFFFFF;
       border: 1px solid var(--border);
       color: var(--text);
-      margin-top: 10px;
     }
 
     .btn-secondary:hover {
@@ -199,7 +207,7 @@
     .btn-primary {
       background: var(--text);
       border: 1px solid var(--text);
-      color: #FFF;
+      color: #FFFFFF;
     }
 
     .btn-primary:hover {
@@ -223,7 +231,7 @@
     .status {
       text-align: center;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       padding: 12px;
       border-radius: var(--input-radius);
       display: none;
@@ -237,13 +245,13 @@
     <!-- Encabezado -->
     <header class="app-header">
       <div class="main-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       </div>
       <h1>Gestor de Repertorio</h1>
       <p>Planifica hasta 5 eventos por mes y sincroniza tus playlists de Spotify y YouTube.</p>
     </header>
 
-    <!-- Configuración GitHub (Desplegable) -->
+    <!-- Configuración GitHub -->
     <details class="card">
       <summary class="card-header" style="margin-bottom:0;">
         <div class="card-header-left">
@@ -255,10 +263,10 @@
             <p>Usuario, repositorio y token de acceso</p>
           </div>
         </div>
-        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </summary>
 
-      <div style="margin-top: 20px;">
+      <div style="margin-top: 18px;">
         <div class="form-group">
           <label>USUARIO DE GITHUB</label>
           <input type="text" id="ghUser" placeholder="ej: camilomora8a55-afk">
@@ -271,13 +279,13 @@
           <label>PERSONAL ACCESS TOKEN (PAT)</label>
           <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
         </div>
-        <button type="button" class="btn btn-secondary" onclick="guardarConfig()">Guardar credenciales localmente</button>
+        <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="guardarConfig()">Guardar credenciales localmente</button>
       </div>
     </details>
 
-    <!-- Mes a programar -->
+    <!-- Selección de Mes -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" style="margin-bottom:14px;">
         <div class="card-header-left">
           <div class="icon-box">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -289,15 +297,15 @@
         </div>
       </div>
       <div class="form-group">
-        <input type="month" id="mesSeleccionado" onchange="autoCompletarLunes()">
+        <input type="month" id="mesSeleccionado">
       </div>
     </div>
 
-    <!-- Contenedor de los 5 Eventos -->
+    <!-- Contenedor Dinámico de Eventos -->
     <form id="repertorioForm">
-      <div id="eventosContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
+      <div id="eventosContainer" style="display:flex; flex-direction:column; gap:18px;"></div>
 
-      <!-- Botones de Acción -->
+      <!-- Acciones principales -->
       <div style="margin-top: 20px; display:flex; flex-direction:column; gap:10px;">
         <button type="button" class="btn btn-primary" onclick="guardarProgramacion()">💾 Guardar Programación en GitHub</button>
         <button type="button" class="btn btn-secondary" onclick="ejecutarSincronizacionInmediata()">🚀 Actualizar Playlists Ahora</button>
@@ -313,13 +321,17 @@
       document.getElementById('ghUser').value = localStorage.getItem('ghUser') || '';
       document.getElementById('ghRepo').value = localStorage.getItem('ghRepo') || '';
       document.getElementById('ghToken').value = localStorage.getItem('ghToken') || '';
-      
+
       const hoy = new Date();
       const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
-      document.getElementById('mesSeleccionado').value = mesActual;
-      
-      renderizarEventos();
-      autoCompletarLunes();
+      const mesInput = document.getElementById('mesSeleccionado');
+      mesInput.value = mesActual;
+
+      // Eventos para actualizar la vista de tarjetas cuando cambia el mes
+      mesInput.addEventListener('change', actualizarEventosPorMes);
+      mesInput.addEventListener('input', actualizarEventosPorMes);
+
+      actualizarEventosPorMes();
     };
 
     function guardarConfig() {
@@ -329,113 +341,113 @@
       alert('Credenciales guardadas localmente.');
     }
 
-    function renderizarEventos() {
-      const container = document.getElementById('eventosContainer');
-      container.innerHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        container.innerHTML += `
-          <div class="card" id="card-evento-${i}">
-            <div class="card-header">
-              <div class="card-header-left">
-                <div class="icon-box">${i}</div>
-                <div class="title-group">
-                  <h3 id="title-evento-${i}">Evento / Semana ${i}</h3>
-                  <p id="sub-evento-${i}">Lunes de ejecución</p>
-                </div>
-              </div>
-              <div class="song-counter">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                <span id="count-${i}">0</span>
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label>FECHA DE EJECUCIÓN (LUNES)</label>
-              <input type="date" id="fecha-${i}">
-            </div>
-
-            <div class="form-group">
-              <label>CANCIONES (NOMBRE O LINK POR LÍNEA)</label>
-              <textarea id="canciones-${i}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/..." oninput="actualizarContador(${i})"></textarea>
-            </div>
-          </div>
-        `;
-      }
+    function formatSubDate(d) {
+      const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      return `${dias[d.getDay()]}, ${d.getDate()} De ${meses[d.getMonth()]}`;
     }
 
-    function actualizarContador(index) {
-      const texto = document.getElementById(`canciones-${index}`).value.trim();
-      const lineas = texto ? texto.split('\n').filter(l => l.trim().length > 0).length : 0;
-      document.getElementById(`count-${index}`).innerText = lineas;
+    function formatDateInput(d) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
     }
 
-    function autoCompletarLunes() {
-      const [year, month] = document.getElementById('mesSeleccionado').value.split('-').map(Number);
-      if (!year || !month) return;
-
-      const formatDate = (d) => {
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
-      };
-
-      const formatSubDate = (d) => {
-        const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
-        let str = d.toLocaleDateString('es-ES', opciones);
-        return str.charAt(0).toUpperCase() + str.slice(1);
-      };
-
-      let listaFechas = [];
-      let listaObjetosDate = [];
+    function calcularLunes(year, month) {
+      let fechas = [];
 
       // 1. Último lunes del mes anterior
-      let ultimoDiaPrevio = new Date(year, month - 1, 0); 
-      while (ultimoDiaPrevio.getDay() !== 1) { 
-        ultimoDiaPrevio.setDate(ultimoDiaPrevio.getDate() - 1);
+      let datePrev = new Date(year, month - 1, 0); // Último día del mes previo
+      while (datePrev.getDay() !== 1) { // 1 = Lunes
+        datePrev.setDate(datePrev.getDate() - 1);
       }
-      listaFechas.push(formatDate(ultimoDiaPrevio));
-      listaObjetosDate.push(new Date(ultimoDiaPrevio));
+      fechas.push(new Date(datePrev));
 
-      // 2. Lunes del mes actual
+      // 2. Lunes del mes seleccionado
       let dateCurr = new Date(year, month - 1, 1);
       while (dateCurr.getMonth() === month - 1) {
         if (dateCurr.getDay() === 1) {
-          listaFechas.push(formatDate(dateCurr));
-          listaObjetosDate.push(new Date(dateCurr));
+          fechas.push(new Date(dateCurr));
         }
         dateCurr.setDate(dateCurr.getDate() + 1);
       }
 
-      // 3. Renderizar en la interfaz
-      for (let i = 1; i <= 5; i++) {
-        const inputFecha = document.getElementById(`fecha-${i}`);
-        const card = document.getElementById(`card-evento-${i}`);
-        const titleH3 = document.getElementById(`title-evento-${i}`);
-        const subP = document.getElementById(`sub-evento-${i}`);
+      return fechas;
+    }
 
-        if (listaFechas[i - 1]) {
-          inputFecha.value = listaFechas[i - 1];
-          card.style.display = 'block';
+    function actualizarEventosPorMes() {
+      const inputVal = document.getElementById('mesSeleccionado').value;
+      if (!inputVal) return;
 
-          if (i === 1) {
-            titleH3.innerText = "Evento 1 (Previo)";
-          } else {
-            titleH3.innerText = `Evento / Semana ${i - 1}`;
-          }
-          subP.innerText = formatSubDate(listaObjetosDate[i - 1]);
-        } else {
-          inputFecha.value = '';
-          card.style.display = 'none';
-        }
-      }
+      const [year, month] = inputVal.split('-').map(Number);
+      const fechasCalculadas = calcularLunes(year, month);
+      const container = document.getElementById('eventosContainer');
+
+      // Preservar textos que el usuario ya haya escrito antes del render
+      let contenidosGuardados = {};
+      const inputsCanciones = container.querySelectorAll('textarea');
+      inputsCanciones.forEach((ta, idx) => {
+        contenidosGuardados[idx] = ta.value;
+      });
+
+      container.innerHTML = '';
+
+      fechasCalculadas.forEach((fecha, index) => {
+        const numEvento = index + 1;
+        const fechaFormatted = formatDateInput(fecha);
+        const subTitulo = formatSubDate(fecha);
+        const textoPrevio = contenidosGuardados[index] || '';
+
+        let tituloTarjeta = (numEvento === 1) ? "Evento 1 (Mes Anterior)" : `Evento / Semana ${numEvento - 1}`;
+
+        container.innerHTML += `
+          <div class="card" id="card-evento-${numEvento}">
+            <div class="card-header">
+              <div class="card-header-left">
+                <div class="icon-box circle">${numEvento}</div>
+                <div class="title-group">
+                  <h3>${tituloTarjeta}</h3>
+                  <p>${subTitulo}</p>
+                </div>
+              </div>
+              <div class="song-counter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <span id="count-${numEvento}">0</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>FECHA DE EJECUCIÓN (LUNES)</label>
+              <input type="date" id="fecha-${numEvento}" value="${fechaFormatted}">
+            </div>
+
+            <div class="form-group">
+              <label>CANCIONES (NOMBRE O LINK POR LÍNEA)</label>
+              <textarea id="canciones-${numEvento}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/..." oninput="actualizarContador(${numEvento})">${textoPrevio}</textarea>
+            </div>
+          </div>
+        `;
+      });
+
+      fechasCalculadas.forEach((_, index) => {
+        actualizarContador(index + 1);
+      });
+    }
+
+    function actualizarContador(index) {
+      const area = document.getElementById(`canciones-${index}`);
+      if (!area) return;
+      const texto = area.value.trim();
+      const lineas = texto ? texto.split('\n').filter(l => l.trim().length > 0).length : 0;
+      const counterSpan = document.getElementById(`count-${index}`);
+      if (counterSpan) counterSpan.innerText = lineas;
     }
 
     async function guardarProgramacion() {
       const user = localStorage.getItem('ghUser');
       const repo = localStorage.getItem('ghRepo');
       const token = localStorage.getItem('ghToken');
-      const statusDiv = document.getElementById('status');
 
       if (!user || !repo || !token) {
         mostrarStatus("⚠️ Configura Usuario, Repositorio y Token arriba.", "#FEF2F2", "#991B1B");
@@ -445,21 +457,27 @@
       mostrarStatus("⏳ Guardando cambios en canciones.json...", "#FEF3C7", "#92400E");
 
       let programacionJSON = {};
+      const tarjetas = document.querySelectorAll('#eventosContainer .card');
 
-      for (let i = 1; i <= 5; i++) {
-        const fecha = document.getElementById(`fecha-${i}`).value;
-        const texto = document.getElementById(`canciones-${i}`).value.trim();
+      tarjetas.forEach((_, idx) => {
+        const i = idx + 1;
+        const fechaEl = document.getElementById(`fecha-${i}`);
+        const textoEl = document.getElementById(`canciones-${i}`);
 
-        if (fecha && texto) {
-          const lista = texto.split('\n').map(linea => linea.trim()).filter(linea => linea.length > 0);
-          programacionJSON[fecha] = lista;
+        if (fechaEl && textoEl) {
+          const fecha = fechaEl.value;
+          const texto = textoEl.value.trim();
+          if (fecha && texto) {
+            const lista = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            programacionJSON[fecha] = lista;
+          }
         }
-      }
+      });
 
       try {
         const urlAPI = `https://api.github.com/repos/${user}/${repo}/contents/canciones.json`;
         let sha = "";
-        
+
         const getRes = await fetch(urlAPI, { headers: { 'Authorization': `token ${token}` } });
         if (getRes.ok) {
           const fileData = await getRes.json();
