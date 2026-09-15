@@ -1,447 +1,420 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestor de Repertorio</title>
+  <title>Gestor de Repertorio Mensual</title>
   <style>
     :root {
-      --bg: #FAFAFA;
-      --card: #FFFFFF;
-      --border: #E4E4E7;
-      --text: #09090B;
-      --muted: #71717A;
       --radius: 16px;
-      --input-radius: 10px;
+    }
+    html[data-theme="light"] {
+      --bg: #f6f6f7;
+      --card: #ffffff;
+      --border: #e7e7ea;
+      --text: #17171a;
+      --muted: #7a7a82;
+      --icon-bg: #17171a;
+      --icon-fg: #ffffff;
+      --input-bg: #f6f6f7;
+      --input-border: #e2e2e6;
+      --shadow: 0 1px 3px rgba(20,20,24,0.06);
+      --accent: #1DB954;
+      --danger: #e5484d;
+      --danger-bg: #fdecec;
+      --warn: #b8860b;
+      --warn-bg: #fdf3dd;
+      --success: #1a7f3c;
+      --success-bg: #e7f7ec;
+    }
+    html[data-theme="dark"] {
+      --bg: #121212;
+      --card: #1c1c1e;
+      --border: #2c2c2e;
+      --text: #f5f5f5;
+      --muted: #9a9a9e;
+      --icon-bg: #f5f5f5;
+      --icon-fg: #121212;
+      --input-bg: #232325;
+      --input-border: #333336;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      --accent: #1DB954;
+      --danger: #ff6b6f;
+      --danger-bg: #3a1f20;
+      --warn: #e2a03f;
+      --warn-bg: #382c10;
+      --success: #3ddc76;
+      --success-bg: #0f2c1a;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      padding: 40px 16px;
+      margin: 0;
+      padding: 24px 16px 60px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .wrap { max-width: 480px; margin: 0 auto; position: relative; }
+
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
       display: flex;
-      justify-content: center;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 560px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    /* Encabezado Principal */
-    .app-header {
-      text-align: center;
-      margin-bottom: 8px;
-    }
-
-    .main-icon {
-      width: 48px;
-      height: 48px;
-      background: var(--text);
-      color: #FFF;
-      border-radius: 12px;
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      z-index: 20;
     }
 
-    .app-header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-      color: var(--text);
+    .hero { text-align: center; margin-bottom: 24px; padding-top: 4px; }
+    .hero-icon {
+      width: 56px; height: 56px;
+      background: var(--icon-bg);
+      color: var(--icon-fg);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 1.4rem;
     }
+    .hero h1 { font-size: 1.5rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+    .hero p { color: var(--muted); font-size: 0.88rem; margin: 0; line-height: 1.4; }
 
-    .app-header p {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.45;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-
-    /* Tarjetas */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-
-    .card-header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .icon-box {
-      width: 40px;
-      height: 40px;
-      background: var(--text);
-      color: #FFF;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.95rem;
-      flex-shrink: 0;
-    }
-
-    .icon-box.circle {
-      border-radius: 50%;
-    }
-
-    .title-group h2, .title-group h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-
-    .title-group p {
-      font-size: 0.83rem;
-      color: var(--muted);
-    }
-
-    .song-counter {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 500;
-    }
-
-    /* Formulario e Inputs */
-    .form-group {
+      box-shadow: var(--shadow);
+      padding: 18px;
       margin-bottom: 14px;
     }
 
-    .form-group:last-child {
-      margin-bottom: 0;
-    }
+    details.card { padding: 0; overflow: hidden; }
+    details.card > summary { padding: 16px 18px; list-style: none; }
+    details.card[open] > summary { border-bottom: 1px solid var(--border); }
+    details.card .details-body { padding: 16px 18px; }
+    summary::-webkit-details-marker { display: none; }
 
-    label {
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    input[type="text"],
-    input[type="password"],
-    input[type="month"],
-    input[type="date"],
-    textarea {
-      width: 100%;
-      padding: 11px 13px;
-      border: 1px solid var(--border);
-      border-radius: var(--input-radius);
-      background: #FFFFFF;
-      color: var(--text);
-      font-size: 0.92rem;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    input:focus, textarea:focus {
-      border-color: var(--text);
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #A1A1AA;
-    }
-
-    textarea {
-      height: 90px;
-      resize: vertical;
-      line-height: 1.4;
-    }
-
-    /* Botones */
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: var(--input-radius);
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
+    .row-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-secondary {
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .btn-secondary:hover {
-      background: #F4F4F5;
-    }
-
-    .btn-primary {
-      background: var(--text);
-      border: 1px solid var(--text);
-      color: #FFFFFF;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-    }
-
-    /* Desplegable GitHub */
-    details summary {
-      list-style: none;
+      gap: 12px;
       cursor: pointer;
     }
-    details summary::-webkit-details-marker { display: none; }
+    .row-icon {
+      flex: none;
+      width: 38px; height: 38px;
+      border-radius: 11px;
+      background: var(--icon-bg);
+      color: var(--icon-fg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .row-icon svg { width: 18px; height: 18px; }
+    .row-icon.number { font-weight: 700; font-size: 0.95rem; }
 
-    .chevron {
-      transition: transform 0.2s;
+    .row-text { flex: 1; min-width: 0; }
+    .row-title { font-weight: 600; font-size: 0.95rem; }
+    .row-sub { color: var(--muted); font-size: 0.78rem; margin-top: 1px; }
+
+    .chevron { color: var(--muted); transition: transform 0.2s ease; font-size: 0.75rem; }
+    details[open] .chevron { transform: rotate(180deg); }
+
+    .badge-count {
+      display: flex; align-items: center; gap: 4px;
+      color: var(--muted); font-size: 0.8rem; font-weight: 600;
+      flex: none;
     }
-    details[open] .chevron {
-      transform: rotate(180deg);
+
+    label.field-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      margin: 14px 0 6px;
     }
+    label.field-label:first-of-type { margin-top: 0; }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 11px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text);
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    textarea { height: 90px; resize: vertical; font-family: ui-monospace, monospace; font-size: 0.84rem; line-height: 1.5; }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    button { font-family: inherit; }
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      border-radius: 11px;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+    .btn-ghost { background: var(--input-bg); color: var(--text); border: 1px solid var(--input-border); }
+    .btn-save { background: var(--accent); color: #05210f; }
+    .btn-run { background: #2e7d32; color: #fff; }
+
+    .event-card { display: none; }
+    .event-card.visible { display: block; }
+
+    .run-card .row-title { color: var(--success); }
 
     .status {
+      margin-top: 14px;
       text-align: center;
       font-weight: 600;
       font-size: 0.88rem;
       padding: 12px;
-      border-radius: var(--input-radius);
+      border-radius: 11px;
       display: none;
+    }
+    .status.show { display: block; }
+    .status.warn { background: var(--warn-bg); color: var(--warn); }
+    .status.error { background: var(--danger-bg); color: var(--danger); }
+    .status.success { background: var(--success-bg); color: var(--success); }
+
+    @media (min-width: 540px) {
+      body { padding: 40px 20px 60px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <button class="theme-toggle" id="themeToggle" onclick="alternarTema()" aria-label="Cambiar tema" type="button">🌙</button>
 
-    <!-- Encabezado -->
-    <header class="app-header">
-      <div class="main-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      </div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-icon">🎵</div>
       <h1>Gestor de Repertorio</h1>
-      <p>Planifica hasta 5 eventos por mes y sincroniza tus playlists de Spotify y YouTube.</p>
-    </header>
+      <p>Planifica hasta 5 eventos por mes y sincroniza tus<br>playlists de Spotify y YouTube.</p>
+    </div>
 
-    <!-- Configuración GitHub -->
-    <details class="card">
-      <summary class="card-header" style="margin-bottom:0;">
-        <div class="card-header-left">
-          <div class="icon-box">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+    <!-- Configuración de GitHub -->
+    <details class="card config-sec">
+      <summary>
+        <div class="row-header">
+          <div class="row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           </div>
-          <div class="title-group">
-            <h2>Conexión con GitHub</h2>
-            <p>Usuario, repositorio y token de acceso</p>
+          <div class="row-text">
+            <div class="row-title">Conexión con GitHub</div>
+            <div class="row-sub">Usuario, repositorio y token de acceso</div>
           </div>
+          <span class="chevron">▾</span>
         </div>
-        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </summary>
-
-      <div style="margin-top: 18px;">
-        <div class="form-group">
-          <label>USUARIO DE GITHUB</label>
-          <input type="text" id="ghUser" placeholder="ej: camilomora8a55-afk">
-        </div>
-        <div class="form-group">
-          <label>NOMBRE DEL REPOSITORIO</label>
-          <input type="text" id="ghRepo" placeholder="ej: auto-playlist">
-        </div>
-        <div class="form-group">
-          <label>PERSONAL ACCESS TOKEN (PAT)</label>
-          <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
-        </div>
-        <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="guardarConfig()">Guardar credenciales localmente</button>
+      <div class="details-body">
+        <label class="field-label">USUARIO DE GITHUB</label>
+        <input type="text" id="ghUser" placeholder="ej: camilomora8a55-afk">
+        <label class="field-label">NOMBRE DEL REPOSITORIO</label>
+        <input type="text" id="ghRepo" placeholder="ej: auto-playlist">
+        <label class="field-label">PERSONAL ACCESS TOKEN (PAT)</label>
+        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+        <button type="button" class="btn btn-ghost" onclick="guardarConfig()">Guardar credenciales localmente</button>
       </div>
     </details>
 
-    <!-- Selección de Mes -->
+    <!-- Selector de Mes -->
     <div class="card">
-      <div class="card-header" style="margin-bottom:14px;">
-        <div class="card-header-left">
-          <div class="icon-box">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          </div>
-          <div class="title-group">
-            <h2>Mes a programar</h2>
-            <p>Cargamos los lunes del mes automáticamente</p>
-          </div>
+      <div class="row-header" style="margin-bottom:14px;">
+        <div class="row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <div class="row-text">
+          <div class="row-title">Mes a programar</div>
+          <div class="row-sub">Cargamos los lunes del mes automáticamente</div>
         </div>
       </div>
-      <div class="form-group">
-        <input type="month" id="mesSeleccionado">
-      </div>
+      <input type="month" id="mesSeleccionado" onchange="autoCompletarLunes()">
     </div>
 
-    <!-- Contenedor Dinámico de Eventos -->
     <form id="repertorioForm">
-      <div id="eventosContainer" style="display:flex; flex-direction:column; gap:18px;"></div>
+      <!-- Eventos / Semanas -->
+      <div id="eventosContainer"></div>
 
-      <!-- Acciones principales -->
-      <div style="margin-top: 20px; display:flex; flex-direction:column; gap:10px;">
-        <button type="button" class="btn btn-primary" onclick="guardarProgramacion()">💾 Guardar Programación en GitHub</button>
-        <button type="button" class="btn btn-secondary" onclick="ejecutarSincronizacionInmediata()">🚀 Actualizar Playlists Ahora</button>
-      </div>
+      <button type="button" class="btn btn-save" onclick="guardarProgramacion()">Guardar programación en GitHub</button>
     </form>
 
-    <div id="status" class="status"></div>
+    <!-- Ejecución Inmediata -->
+    <div class="card run-card">
+      <div class="row-header" style="margin-bottom:6px;">
+        <div class="row-icon" style="background:#2e7d32;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6Z"/></svg>
+        </div>
+        <div class="row-text">
+          <div class="row-title">Ejecución manual directa</div>
+        </div>
+      </div>
+      <p class="row-sub" style="margin:0 0 4px 50px;">Sincroniza Spotify y YouTube en este instante con las canciones de la fecha actual.</p>
+      <button type="button" class="btn btn-run" onclick="ejecutarSincronizacionInmediata()">Actualizar playlists ahora</button>
+    </div>
 
+    <div id="status" class="status"></div>
   </div>
 
   <script>
+    const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
     window.onload = () => {
+      // Tema
+      const temaGuardado = localStorage.getItem('tema') || 'light';
+      document.documentElement.setAttribute('data-theme', temaGuardado);
+      actualizarIconoTema();
+
+      // Credenciales
       document.getElementById('ghUser').value = localStorage.getItem('ghUser') || '';
       document.getElementById('ghRepo').value = localStorage.getItem('ghRepo') || '';
       document.getElementById('ghToken').value = localStorage.getItem('ghToken') || '';
 
       const hoy = new Date();
       const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
-      const mesInput = document.getElementById('mesSeleccionado');
-      mesInput.value = mesActual;
+      document.getElementById('mesSeleccionado').value = mesActual;
 
-      // Eventos para actualizar la vista de tarjetas cuando cambia el mes
-      mesInput.addEventListener('change', actualizarEventosPorMes);
-      mesInput.addEventListener('input', actualizarEventosPorMes);
-
-      actualizarEventosPorMes();
+      renderizarEventos();
+      autoCompletarLunes();
     };
+
+    function alternarTema() {
+      const actual = document.documentElement.getAttribute('data-theme');
+      const nuevo = actual === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nuevo);
+      localStorage.setItem('tema', nuevo);
+      actualizarIconoTema();
+    }
+
+    function actualizarIconoTema() {
+      const tema = document.documentElement.getAttribute('data-theme');
+      document.getElementById('themeToggle').innerText = tema === 'dark' ? '☀️' : '🌙';
+    }
 
     function guardarConfig() {
       localStorage.setItem('ghUser', document.getElementById('ghUser').value.trim());
       localStorage.setItem('ghRepo', document.getElementById('ghRepo').value.trim());
       localStorage.setItem('ghToken', document.getElementById('ghToken').value.trim());
-      alert('Credenciales guardadas localmente.');
+      alert('Credenciales guardadas en tu navegador.');
     }
 
-    function formatSubDate(d) {
-      const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-      return `${dias[d.getDay()]}, ${d.getDate()} De ${meses[d.getMonth()]}`;
+    function renderizarEventos() {
+      const container = document.getElementById('eventosContainer');
+      container.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        container.innerHTML += `
+          <div class="card event-card" id="card-evento-${i}">
+            <div class="row-header" style="margin-bottom:14px;">
+              <div class="row-icon number">${i}</div>
+              <div class="row-text">
+                <div class="row-title">Evento / Semana ${i}</div>
+                <div class="row-sub" id="subtitulo-${i}">Sin fecha asignada</div>
+              </div>
+              <div class="badge-count">♫ <span id="contador-${i}">0</span></div>
+            </div>
+            <label class="field-label">FECHA DE EJECUCIÓN (LUNES)</label>
+            <input type="date" class="fecha-evento" id="fecha-${i}" onchange="actualizarSubtitulo(${i})">
+            <label class="field-label">CANCIONES (NOMBRE O LINK DE SPOTIFY/YOUTUBE)</label>
+            <textarea class="canciones-evento" id="canciones-${i}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/4cOdK2wG..." oninput="actualizarContador(${i})"></textarea>
+          </div>
+        `;
+      }
     }
 
-    function formatDateInput(d) {
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
+    function actualizarContador(i) {
+      const texto = document.getElementById(`canciones-${i}`).value.trim();
+      const total = texto === '' ? 0 : texto.split('\n').map(l => l.trim()).filter(l => l.length > 0).length;
+      document.getElementById(`contador-${i}`).innerText = total;
+    }
+
+    function actualizarSubtitulo(i) {
+      const fecha = document.getElementById(`fecha-${i}`).value;
+      document.getElementById(`subtitulo-${i}`).innerText = formatearFechaSubtitulo(fecha);
+    }
+
+    function formatearFechaSubtitulo(fechaStr) {
+      if (!fechaStr) return 'Sin fecha asignada';
+      const [year, month, day] = fechaStr.split('-').map(Number);
+      const fecha = new Date(year, month - 1, day);
+      const nombreDia = DIAS[fecha.getDay()];
+      const nombreMes = MESES[fecha.getMonth()];
+      return `${nombreDia}, ${fecha.getDate()} De ${nombreMes}`;
+    }
+
+    // Devuelve la fecha del último lunes del mes ANTERIOR al mes/año indicado
+    function ultimoLunesMesAnterior(year, month) {
+      // último día del mes anterior
+      let fecha = new Date(year, month - 1, 1);
+      fecha.setDate(fecha.getDate() - 1);
+      while (fecha.getDay() !== 1) {
+        fecha.setDate(fecha.getDate() - 1);
+      }
+      return fecha;
+    }
+
+    function toISO(fecha) {
+      const yyyy = fecha.getFullYear();
+      const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+      const dd = String(fecha.getDate()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    function calcularLunes(year, month) {
-      let fechas = [];
+    function autoCompletarLunes() {
+      const [year, month] = document.getElementById('mesSeleccionado').value.split('-').map(Number);
+      if (!year || !month) return;
 
-      // 1. Último lunes del mes anterior
-      let datePrev = new Date(year, month - 1, 0); // Último día del mes previo
-      while (datePrev.getDay() !== 1) { // 1 = Lunes
-        datePrev.setDate(datePrev.getDate() - 1);
+      // 1) último lunes del mes anterior (siempre primero)
+      const lunesPrevio = ultimoLunesMesAnterior(year, month);
+
+      // 2) todos los lunes del mes seleccionado
+      let fecha = new Date(year, month - 1, 1);
+      let lunesDelMes = [];
+      while (fecha.getMonth() === month - 1) {
+        if (fecha.getDay() === 1) lunesDelMes.push(new Date(fecha));
+        fecha.setDate(fecha.getDate() + 1);
       }
-      fechas.push(new Date(datePrev));
 
-      // 2. Lunes del mes seleccionado
-      let dateCurr = new Date(year, month - 1, 1);
-      while (dateCurr.getMonth() === month - 1) {
-        if (dateCurr.getDay() === 1) {
-          fechas.push(new Date(dateCurr));
+      // 3) combinar: el lunes anterior primero, luego los del mes, máximo 5 tarjetas
+      const todosLosLunes = [lunesPrevio, ...lunesDelMes].slice(0, 5).map(toISO);
+
+      for (let i = 1; i <= 5; i++) {
+        const inputFecha = document.getElementById(`fecha-${i}`);
+        const card = document.getElementById(`card-evento-${i}`);
+        if (todosLosLunes[i - 1]) {
+          inputFecha.value = todosLosLunes[i - 1];
+          card.classList.add('visible');
+          actualizarSubtitulo(i);
+          actualizarContador(i);
+        } else {
+          inputFecha.value = '';
+          document.getElementById(`subtitulo-${i}`).innerText = 'Sin fecha asignada';
+          card.classList.remove('visible');
         }
-        dateCurr.setDate(dateCurr.getDate() + 1);
       }
-
-      return fechas;
     }
 
-    function actualizarEventosPorMes() {
-      const inputVal = document.getElementById('mesSeleccionado').value;
-      if (!inputVal) return;
-
-      const [year, month] = inputVal.split('-').map(Number);
-      const fechasCalculadas = calcularLunes(year, month);
-      const container = document.getElementById('eventosContainer');
-
-      // Preservar textos que el usuario ya haya escrito antes del render
-      let contenidosGuardados = {};
-      const inputsCanciones = container.querySelectorAll('textarea');
-      inputsCanciones.forEach((ta, idx) => {
-        contenidosGuardados[idx] = ta.value;
-      });
-
-      container.innerHTML = '';
-
-      fechasCalculadas.forEach((fecha, index) => {
-        const numEvento = index + 1;
-        const fechaFormatted = formatDateInput(fecha);
-        const subTitulo = formatSubDate(fecha);
-        const textoPrevio = contenidosGuardados[index] || '';
-
-        let tituloTarjeta = (numEvento === 1) ? "Evento 1 (Mes Anterior)" : `Evento / Semana ${numEvento - 1}`;
-
-        container.innerHTML += `
-          <div class="card" id="card-evento-${numEvento}">
-            <div class="card-header">
-              <div class="card-header-left">
-                <div class="icon-box circle">${numEvento}</div>
-                <div class="title-group">
-                  <h3>${tituloTarjeta}</h3>
-                  <p>${subTitulo}</p>
-                </div>
-              </div>
-              <div class="song-counter">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                <span id="count-${numEvento}">0</span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>FECHA DE EJECUCIÓN (LUNES)</label>
-              <input type="date" id="fecha-${numEvento}" value="${fechaFormatted}">
-            </div>
-
-            <div class="form-group">
-              <label>CANCIONES (NOMBRE O LINK POR LÍNEA)</label>
-              <textarea id="canciones-${numEvento}" placeholder="Way Maker - Sinach&#10;https://open.spotify.com/track/..." oninput="actualizarContador(${numEvento})">${textoPrevio}</textarea>
-            </div>
-          </div>
-        `;
-      });
-
-      fechasCalculadas.forEach((_, index) => {
-        actualizarContador(index + 1);
-      });
-    }
-
-    function actualizarContador(index) {
-      const area = document.getElementById(`canciones-${index}`);
-      if (!area) return;
-      const texto = area.value.trim();
-      const lineas = texto ? texto.split('\n').filter(l => l.trim().length > 0).length : 0;
-      const counterSpan = document.getElementById(`count-${index}`);
-      if (counterSpan) counterSpan.innerText = lineas;
+    function mostrarStatus(tipo, mensaje) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = `status show ${tipo}`;
+      statusDiv.innerText = mensaje;
     }
 
     async function guardarProgramacion() {
@@ -450,29 +423,23 @@
       const token = localStorage.getItem('ghToken');
 
       if (!user || !repo || !token) {
-        mostrarStatus("⚠️ Configura Usuario, Repositorio y Token arriba.", "#FEF2F2", "#991B1B");
+        mostrarStatus('warn', '⚠️ Configura Usuario, Repositorio y Token en la sección superior.');
         return;
       }
 
-      mostrarStatus("⏳ Guardando cambios en canciones.json...", "#FEF3C7", "#92400E");
+      mostrarStatus('warn', '⏳ Guardando cambios en canciones.json...');
 
       let programacionJSON = {};
-      const tarjetas = document.querySelectorAll('#eventosContainer .card');
 
-      tarjetas.forEach((_, idx) => {
-        const i = idx + 1;
-        const fechaEl = document.getElementById(`fecha-${i}`);
-        const textoEl = document.getElementById(`canciones-${i}`);
+      for (let i = 1; i <= 5; i++) {
+        const fecha = document.getElementById(`fecha-${i}`).value;
+        const texto = document.getElementById(`canciones-${i}`).value.trim();
 
-        if (fechaEl && textoEl) {
-          const fecha = fechaEl.value;
-          const texto = textoEl.value.trim();
-          if (fecha && texto) {
-            const lista = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            programacionJSON[fecha] = lista;
-          }
+        if (fecha && texto) {
+          const lista = texto.split('\n').map(linea => linea.trim()).filter(linea => linea.length > 0);
+          programacionJSON[fecha] = lista;
         }
-      });
+      }
 
       try {
         const urlAPI = `https://api.github.com/repos/${user}/${repo}/contents/canciones.json`;
@@ -500,12 +467,13 @@
         });
 
         if (putRes.ok) {
-          mostrarStatus("✔ ¡Éxito! Canciones guardadas en GitHub.", "#ECFDF5", "#065F46");
+          mostrarStatus('success', '✔ ¡Éxito! Canciones guardadas correctamente.');
         } else {
-          throw new Error("Error en la API de GitHub.");
+          throw new Error("Error al guardar en GitHub.");
         }
       } catch (err) {
-        mostrarStatus("❌ Error al guardar. Verifica credenciales.", "#FEF2F2", "#991B1B");
+        mostrarStatus('error', '❌ Error al guardar. Verifica el Token y los datos.');
+        console.error(err);
       }
     }
 
@@ -515,11 +483,11 @@
       const token = localStorage.getItem('ghToken');
 
       if (!user || !repo || !token) {
-        mostrarStatus("⚠️ Configura Usuario, Repositorio y Token arriba.", "#FEF2F2", "#991B1B");
+        mostrarStatus('warn', '⚠️ Configura Usuario, Repositorio y Token en la sección superior.');
         return;
       }
 
-      mostrarStatus("⏳ Iniciando actualización en GitHub Actions...", "#FEF3C7", "#92400E");
+      mostrarStatus('warn', '⏳ Solicitando ejecución a GitHub Actions...');
 
       try {
         const urlAPI = `https://api.github.com/repos/${user}/${repo}/actions/workflows/sync_playlists.yml/dispatches`;
@@ -535,21 +503,14 @@
         });
 
         if (res.status === 204) {
-          mostrarStatus("⚡ ¡Proceso iniciado! Playlists actualizándose.", "#ECFDF5", "#065F46");
+          mostrarStatus('success', '⚡ ¡Automatización iniciada! En 1-2 minutos tus playlists de Spotify y YouTube quedarán actualizadas.');
         } else {
-          throw new Error("Error al disparar la acción.");
+          throw new Error("No se pudo iniciar la acción. Revisa los permisos del token.");
         }
       } catch (err) {
-        mostrarStatus("❌ Error al iniciar la ejecución.", "#FEF2F2", "#991B1B");
+        mostrarStatus('error', '❌ Error al iniciar la ejecución en GitHub.');
+        console.error(err);
       }
-    }
-
-    function mostrarStatus(mensaje, bg, color) {
-      const statusDiv = document.getElementById('status');
-      statusDiv.style.display = 'block';
-      statusDiv.style.background = bg;
-      statusDiv.style.color = color;
-      statusDiv.innerText = mensaje;
     }
   </script>
 </body>
